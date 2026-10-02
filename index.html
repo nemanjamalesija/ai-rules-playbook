@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI Rules Playbook</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #ffffff;
+  --ink: #1f2328;
+  --muted: #59636e;
+  --line: #d8dee4;
+  --link: #1a5fb4;
+  --code-bg: #f3f4f6;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #16181b;
+    --ink: #e6e8eb;
+    --muted: #9ba3ad;
+    --line: #30363d;
+    --link: #79a8e8;
+    --code-bg: #22262b;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #16181b;
+  --ink: #e6e8eb;
+  --muted: #9ba3ad;
+  --line: #30363d;
+  --link: #79a8e8;
+  --code-bg: #22262b;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 0 20px;
+}
+a { color: var(--link); }
+.page {
+  max-width: 980px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 48px;
+  padding-block: 48px 80px;
+}
+nav.toc {
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + 24px);
+  align-self: start;
+  font-size: 14px;
+}
+nav.toc p { font-weight: 600; margin: 0 0 8px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+nav.toc a { color: var(--muted); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { color: var(--link); text-decoration: underline; }
+nav.toc .sub { padding-left: 12px; }
+main { min-width: 0; max-width: 700px; }
+h1 { font-size: 30px; line-height: 1.25; margin: 0 0 12px; font-weight: 600; }
+.lede { font-size: 17px; margin: 0; }
+h2 {
+  font-size: 23px;
+  line-height: 1.3;
+  font-weight: 600;
+  margin: 56px 0 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 16px;
+}
+.section-note { color: var(--muted); margin: 8px 0 0; }
+h3 { font-size: 18px; font-weight: 600; margin: 40px 0 4px; scroll-margin-top: 16px; }
+p { margin: 0 0 12px; }
+code {
+  font-family: var(--mono);
+  font-size: 0.86em;
+  background: var(--code-bg);
+  padding: 1px 4px;
+  border-radius: 3px;
+  overflow-wrap: anywhere;
+}
+.rule { padding: 16px 0 4px; scroll-margin-top: 16px; }
+.rule .statement { font-weight: 600; margin: 0 0 6px; }
+.rule .rid { color: var(--muted); margin-right: 4px; }
+.evidence {
+  margin: 8px 0 12px;
+  padding: 2px 0 2px 14px;
+  border-left: 3px solid var(--line);
+  color: var(--muted);
+}
+.evidence b { color: var(--ink); font-weight: 600; margin-right: 4px; }
+.pair { margin: 8px 0 12px; padding-left: 14px; border-left: 3px solid var(--line); }
+.pair div { margin: 2px 0; }
+.pair span { font-weight: 600; margin-right: 4px; }
+ul.plain, ol.steps { margin: 12px 0; padding-left: 22px; }
+ul.plain li, ol.steps li { margin-bottom: 8px; }
+.prompt-box { margin: 16px 0 0; border: 1px solid var(--line); border-radius: 6px; }
+.prompt-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--muted);
+}
+.prompt-bar button {
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+.prompt-bar button:hover { background: var(--code-bg); }
+.prompt-bar button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+pre#prompt {
+  margin: 0;
+  padding: 14px;
+  background: var(--code-bg);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 560px;
+  overflow-y: auto;
+  border-radius: 0 0 6px 6px;
+}
+.ph { color: var(--link); }
+.table-wrap { overflow-x: auto; margin: 12px 0 0; }
+table { border-collapse: collapse; width: 100%; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { font-weight: 600; }
+td:first-child { white-space: nowrap; }
+@media (max-width: 820px) {
+  .page { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-block: 28px 64px; }
+  nav.toc { position: static; }
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <nav class="toc" aria-label="Contents">
+    <p>On this page</p>
+    <ol>
+      <li><a href="#why">What a rule doc does</a></li>
+      <li><a href="#guidelines">Guidelines</a></li>
+      <li class="sub"><a href="#purpose">What a rule doc is for</a></li>
+      <li class="sub"><a href="#true">Lines that stay true</a></li>
+      <li class="sub"><a href="#where">Where a line lives</a></li>
+      <li class="sub"><a href="#review">Fixing and reviewing</a></li>
+      <li><a href="#prompt-section">Drafting prompt</a></li>
+      <li class="sub"><a href="#adapt">Filling it in</a></li>
+      <li class="sub"><a href="#large">Large codebases</a></li>
+      <li class="sub"><a href="#after">After the draft</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header id="why">
+      <h1>AI Rules Playbook</h1>
+      <p class="lede">An AI rule doc is a file an agent loads while it works in part of the code. A good one stops the agent from making a mistake it cannot see coming. A bad one teaches it a wrong fact with full confidence.</p>
+    </header>
+
+    <h2 id="guidelines">Guidelines</h2>
+    <p class="section-note">Four groups. Cite a rule by its ID in a review comment, for example "this line breaks G6".</p>
+
+    <h3 id="purpose">What a rule doc is for</h3>
+
+    <div class="rule" id="G1">
+      <div>
+        <p class="statement"><span class="rid">G1.</span>A doc states the correct pattern, and the chapter decides what that pattern is.</p>
+        <p>An agent that writes a doc only sees the files it has open. It sees one feature do something and writes "every page does X", because that is how documentation usually sounds. Counting across the code catches a doc that copied one feature. The count still does not decide the pattern. A person who owns the area does.</p>
+        <div class="evidence"><b>Example:</b>A doc told everyone to put a feature's pages in a <code>pages/</code> folder. Only one feature did that. Five others kept their pages flat, and the one feature was the wrong one.</div>
+      </div>
+    </div>
+
+    <div class="rule" id="G2">
+      <div>
+        <p class="statement"><span class="rid">G2.</span>A consumer that does it wrong never becomes an exception line or an example.</p>
+        <p>Code that breaks a rule does not make the rule false. If the doc adds "except in feature Y", the agent reads feature Y as allowed and copies it. Keep a short list of the known wrong consumers in your area, and give it to every agent that writes or reviews your rules.</p>
+      </div>
+    </div>
+
+    <div class="rule" id="G3">
+      <div>
+        <p class="statement"><span class="rid">G3.</span>Keep traps, rules and decisions. Delete descriptions of what the code visibly does.</p>
+        <p>A trap is behaviour an agent cannot see in the code, which costs an hour when missed. A rule says what to do or avoid. A decision records a choice and why. A description only retells the code. The test: if an agent learns it by opening one file or running one search, it does not belong in the doc.</p>
+        <p>Descriptions are the sentences that go false. The code changes and nobody updates the retelling.</p>
+        <div class="pair">
+          <div><span>Keep (trap):</span>A new service file has to be imported by hand. A file nobody imports is never mounted, and its route answers 404.</div>
+          <div><span>Delete (description):</span>A service file exports one definition or an array of them.</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 id="true">Writing a line that stays true</h3>
+
+    <div class="rule" id="G4">
+      <div>
+        <p class="statement"><span class="rid">G4.</span>No line numbers. Name the file and the identifier.</p>
+        <p>A line number is correct until the next commit above it. A function name survives most edits, and when it does not, a search finds the break.</p>
+      </div>
+    </div>
+
+    <div class="rule" id="G5">
+      <div>
+        <p class="statement"><span class="rid">G5.</span>No pasted copies of real files. A code block shows a shape.</p>
+        <p>A block labelled with a real file path is a copy, and a copy goes stale without any warning. Write the smallest shape that shows the pattern, and point at the file to copy.</p>
+        <div class="evidence"><b>Example:</b>A 30-line copy of a vendor file was already wrong: it called a function it no longer imported.</div>
+      </div>
+    </div>
+
+    <div class="rule" id="G6">
+      <div>
+        <p class="statement"><span class="rid">G6.</span>No counts and no lists of who does what. Write the condition that decides.</p>
+        <p>A list of pages, routes or helpers is true today and wrong the day someone adds one more. The condition behind the list stays true.</p>
+        <div class="pair">
+          <div><span>Instead of:</span>Search, browse and listing detail forward banners to the main store.</div>
+          <div><span>Write:</span>A page that shows banners forwards <code>banners</code> to the main store.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rule" id="G7">
+      <div>
+        <p class="statement"><span class="rid">G7.</span>At most one example file per rule, and it comes from a correct consumer.</p>
+        <p>One file to copy helps. Three files turn into a list (G6). An example from a wrong consumer teaches the wrong pattern (G2).</p>
+      </div>
+    </div>
+
+    <div class="rule" id="G8">
+      <div>
+        <p class="statement"><span class="rid">G8.</span>Write "every", "always", "only" or "never" only after you checked for the counterexample.</p>
+        <p>These words make a line sound certain, so an agent trusts it most. A single counterexample in the code makes the whole line false.</p>
+      </div>
+    </div>
+
+    <div class="rule" id="G9">
+      <div>
+        <p class="statement"><span class="rid">G9.</span>Prove every claim about behaviour by reading the code.</p>
+        <p>A claim that sounds logical from the shape of the code is a guess. A reviewer who reads it makes the same guess and agrees, so reviews do not catch it.</p>
+        <div class="evidence"><b>Example:</b>"A wrong parameter name makes the call 404" sounded right, because the URL is built from the call. The code sends only the values, so a wrong name puts the value in the wrong parameter and no error appears.</div>
+      </div>
+    </div>
+
+    <div class="rule" id="G10">
+      <div>
+        <p class="statement"><span class="rid">G10.</span>Describe the current state only. No history, no plans.</p>
+        <p>"Moved from", "previously" and "used to" describe history, and git already has it. "Will", "yet" and "planned" describe a future that may never come. Both go stale, and both confuse an agent about what is true now.</p>
+      </div>
+    </div>
+
+    <div class="rule" id="G11">
+      <div>
+        <p class="statement"><span class="rid">G11.</span>Plain English and short sentences.</p>
+        <p>Many developers read English as a second language, and an agent follows a plain sentence more reliably than a clever one. One fact per sentence. Explain a pattern in plain words before you name it.</p>
+      </div>
+    </div>
+
+    <h3 id="where">Where a line lives</h3>
+
+    <div class="rule" id="G12">
+      <div>
+        <p class="statement"><span class="rid">G12.</span>Each fact lives in one doc. Point to it instead of repeating it.</p>
+        <p>Two copies of a fact drift apart, and then the agent loads both and has to pick one. Before you add a line, search the other docs. If a doc that loads on the same files already says it, write a pointer.</p>
+      </div>
+    </div>
+
+    <div class="rule" id="G13">
+      <div>
+        <p class="statement"><span class="rid">G13.</span>Put a trap in the doc that loads on the file where the mistake gets made.</p>
+        <p>A doc is path scoped: it loads only when the agent opens a matching file (in Claude Code, the <code>paths:</code> list in its frontmatter). A trap in a doc that never loads on the right file never helps anyone. Check which docs load for a file before you decide where a line goes.</p>
+        <div class="evidence"><b>Example:</b>The trap "never run prettier over these files" lived in a doc that loads only on translation files. Nobody editing a component ever saw it.</div>
+      </div>
+    </div>
+
+    <div class="rule" id="G14">
+      <div>
+        <p class="statement"><span class="rid">G14.</span>Never narrow a doc's loading to save context.</p>
+        <p>A rule that fails to load where it matters costs far more than a few kilobytes of context. Narrow a path scope only when you are sure the doc has nothing to say to those files. After any change, check that the doc still loads on the file where the trap's mistake gets made. Check it with a script, not by hand: a hand check covers only what someone remembers to check, and a script checks every doc every time.</p>
+        <div class="evidence"><b>Example:</b>A short Node script reads the <code>paths:</code> list of every rule doc, flags a pattern that matches no tracked file, and, given one file, lists the docs that load for it. It needs one dependency, <code>multimatch</code>, which also handles brace patterns.</div>
+      </div>
+    </div>
+
+    <h3 id="review">Fixing and reviewing</h3>
+
+    <div class="rule" id="G15">
+      <div>
+        <p class="statement"><span class="rid">G15.</span>A false line is deleted by default.</p>
+        <p>Making a false line true almost always means adding its exception or its caveat, so every fix makes the doc longer and harder to keep true. Keep a line only when it is a trap. Then write its shortest true version.</p>
+      </div>
+    </div>
+
+    <div class="rule" id="G16">
+      <div>
+        <p class="statement"><span class="rid">G16.</span>When you overturn a claim, search every doc for the old claim in the same change.</p>
+        <p>The old answer stays in every other file that repeated it, and those files still look approved. Nothing shows the gap until an agent loads two docs that disagree.</p>
+      </div>
+    </div>
+
+    <div class="rule" id="G17">
+      <div>
+        <p class="statement"><span class="rid">G17.</span>Measure each changed doc against the main branch.</p>
+        <p>Compare the word count per doc. A fix makes a doc longer only when it adds a real trap. Also check that every file path in the changed lines exists.</p>
+      </div>
+    </div>
+
+    <div class="rule" id="G18">
+      <div>
+        <p class="statement"><span class="rid">G18.</span>Review rules by running commands, with a fresh agent. Then check the reviewer.</p>
+        <p>A review that only reads the doc opens the example the doc names, and that example agrees, because the line was written from it. The reviewer has to search and count. Use a fresh agent and not a copy of the one that wrote the lines, because a copy carries the same context and defends it. Before you apply a finding, check its evidence yourself: reviewers are wrong sometimes too.</p>
+      </div>
+    </div>
+
+    <div class="rule" id="G19">
+      <div>
+        <p class="statement"><span class="rid">G19.</span>Review the changed lines in every rules MR, and audit everything only now and then. Stop when the findings turn into taste.</p>
+        <p>A reviewer's job is to find something, so a fresh one always will. What matters is the kind of finding. Another round is worth it only while reviews still find false claims or rules that do not load where they matter. The code proves those. When the findings become wording, or a new reviewer disagrees with the last one, stop.</p>
+      </div>
+    </div>
+
+    <div class="rule" id="G20">
+      <div>
+        <p class="statement"><span class="rid">G20.</span>Bloat means repeated or unneeded text, not a large file.</p>
+        <p>A long doc full of real traps is fine. A short doc that retells the code is not. Cut repetition and descriptions. Never cut a trap to reach a length.</p>
+      </div>
+    </div>
+
+    <h2 id="prompt-section">Drafting prompt</h2>
+    <p class="section-note">A starting prompt for the first version of a chapter's rules. It works on one area at a time and stops to ask the owner before it writes anything. Fill in the coloured parts, then adapt the rest to your stack.</p>
+
+    <div class="prompt-box">
+      <div class="prompt-bar">
+        <span>draft-ai-rules.txt</span>
+        <button type="button" id="copy">Copy</button>
+      </div>
+<pre id="prompt">You are drafting the first version of the AI rule docs for one area of our codebase. The main reader is an AI coding agent that loads these docs while it works in this area. Developers read them too.
+
+Area: <span class="ph">&lt;one folder or feature, for example src/payments/&gt;</span>
+Where the doc goes and how it loads: <span class="ph">&lt;for example docs/ai/payments.md, loaded through a `paths:` list in its frontmatter&gt;</span>
+Reference implementations, the correct pattern chosen by the chapter: <span class="ph">&lt;two or three paths&gt;</span>
+Known wrong consumers, never an example and never an exception: <span class="ph">&lt;paths, or "none known"&gt;</span>
+Existing docs this area must not repeat: <span class="ph">&lt;paths&gt;</span>
+How to run commands in this repo: <span class="ph">&lt;for example a Docker wrapper script, the lint command, the test command&gt;</span>
+
+Work in four steps. Stop after step 3 and wait for my answers.
+
+Step 1. Read. Do not write anything yet.
+Read the reference implementations first, then the rest of the area. If the area is large, split it into sub-areas and read each one with its own subagent. Each subagent returns candidates with evidence, not prose, and never writes the doc. Do not scan the whole repository.
+
+Step 2. List candidates.
+For everything an agent working here would need to know, write one candidate:
+- the line itself, in one or two sentences
+- its kind: trap (behaviour an agent cannot see in the code, which costs time when missed), rule (what to do or avoid), decision (a choice and its reason), or description (what the code visibly does)
+- the evidence: the file and the identifier, and for a claim about behaviour, the code you read that proves it
+- for a convention: how many places follow it and how many do not, with one path from each side
+Drop every description. Drop anything an agent learns by opening one file.
+
+Step 3. Ask me.
+Where the code disagrees with itself, do not pick the majority. Show both sides with their counts and one path each, and ask me which one is the correct pattern. Put all questions in one list, and give every question your recommendation and why, so "go with your recommendations" is a complete answer. Then wait.
+
+Step 4. Write the draft.
+Write only traps, rules and decisions, with my answers applied:
+- No line numbers. Name the file and the identifier.
+- No pasted copies of real files. A code block shows a shape only.
+- No counts and no lists of which files do something. Write the condition that decides.
+- At most one example file per rule, taken from a reference implementation.
+- Use "every", "always", "only" or "never" only after you checked for the counterexample.
+- Current state only. No history, no plans.
+- Plain English, short sentences, no em dashes.
+- Each fact once. If an existing doc that loads on the same files already says it, point there.
+- Scope the doc's loading to the files where each trap's mistake gets made. When unsure, load wider, not narrower.
+Then check that every path in the draft exists, and list the files the doc will load on.
+
+Report: the draft, the calls you made as defaults so I can overturn them, and every claim you could not prove.</pre>
+    </div>
+
+    <h3 id="adapt">Filling it in</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>What to put there</th></tr></thead>
+        <tbody>
+          <tr><td>Area</td><td>What one developer works on at a time: a feature, a module, a layer. Small enough that its reference implementations can be read in one sitting.</td></tr>
+          <tr><td>Reference implementations</td><td>The chapter's own choice of the code that does it right. This is the most important field. Without it, the agent treats whatever it reads first as the pattern.</td></tr>
+          <tr><td>Known wrong consumers</td><td>Code that does it wrong and should not spread. Naming it up front keeps it out of the examples and the exceptions (G2).</td></tr>
+          <tr><td>Existing docs</td><td>Docs that already load on these files, including shared or company-wide ones. The agent points to them instead of repeating them (G12).</td></tr>
+          <tr><td>Commands</td><td>How your repo runs tools, so the agent proves behaviour instead of guessing it (G9).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="large">Large codebases</h3>
+    <p>A prompt that says "scan the repo and write our rules" writes one feature's habit up as a universal rule. Work area by area instead.</p>
+    <ol class="steps">
+      <li><div><strong>Start with the shared layers.</strong> Draft the rules for the code every feature uses first, such as infrastructure, the HTTP client and error handling. Feature docs can then point to those rules instead of repeating them.</div></li>
+      <li><div><strong>One area per session.</strong> Pick one area, run the prompt, answer its questions, and ship that doc in its own MR. The next area starts in a fresh session.</div></li>
+      <li><div><strong>Split a big area across subagents.</strong> Each subagent reads one sub-area and returns candidates with evidence. The main session merges them, removes repeats, and asks the owner. Subagents never write the doc, so the decisions stay in one place.</div></li>
+      <li><div><strong>Keep the owner in the loop.</strong> Step 3 of the prompt is where the owner's knowledge enters. Skipping it is how a majority vote in the code becomes the rule.</div></li>
+    </ol>
+
+    <h3 id="after">After the draft</h3>
+    <ul class="plain">
+      <li>Have a fresh agent review the draft against the code before the MR (G18). Give the reviewer the paths to check, the known wrong consumers, and the instruction to prove every claim with a command.</li>
+      <li>From then on, every MR that touches a rule doc gets one fresh review of its changed lines (G19).</li>
+      <li>Audit a chapter's whole doc set only now and then, and stop when the findings turn into wording.</li>
+    </ul>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  var button = document.getElementById('copy');
+  var pre = document.getElementById('prompt');
+  if (!button || !pre) { return; }
+  button.addEventListener('click', function () {
+    var text = pre.innerText;
+    function selectText() {
+      var range = document.createRange();
+      range.selectNodeContents(pre);
+      var selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      button.textContent = 'Selected, press Ctrl+C';
+    }
+    try {
+      navigator.clipboard.writeText(text).then(function () {
+        button.textContent = 'Copied';
+        setTimeout(function () { button.textContent = 'Copy'; }, 2000);
+      }, selectText);
+    } catch (error) {
+      selectText();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
