@@ -1,5 +1,5 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<title>AI Rules Playbook</title>
+<title>AI rules playbook</title>
 <style>
 :root {
   --bg: #ffffff;
@@ -164,12 +164,12 @@ td:first-child { white-space: nowrap; }
 
   <main>
     <header id="why">
-      <h1>AI Rules Playbook</h1>
+      <h1>AI rules playbook</h1>
       <p class="lede">An AI rule doc is a file an agent loads while it works in part of the code. A good one stops the agent from making a mistake it cannot see coming. A bad one teaches it a wrong fact with full confidence.</p>
     </header>
 
     <h2 id="guidelines">Guidelines</h2>
-    <p class="section-note">Four groups. Cite a rule by its ID in a review comment, for example "this line breaks G6".</p>
+    <p class="section-note">Cite a rule by its ID in a review comment, for example "this line breaks G6".</p>
 
     <h3 id="purpose">What a rule doc is for</h3>
 
@@ -183,7 +183,7 @@ td:first-child { white-space: nowrap; }
 
     <div class="rule" id="G2">
       <div>
-        <p class="statement"><span class="rid">G2.</span>A consumer that does it wrong never becomes an exception line or an example.</p>
+        <p class="statement"><span class="rid">G2.</span>A consumer that breaks the pattern never becomes an exception line or an example.</p>
         <p>Code that breaks a rule does not make the rule false. If the doc adds "except in feature Y", the agent reads feature Y as allowed and copies it. Keep a short list of the known wrong consumers in your area, and give it to every agent that writes or reviews your rules.</p>
       </div>
     </div>
@@ -191,10 +191,10 @@ td:first-child { white-space: nowrap; }
     <div class="rule" id="G3">
       <div>
         <p class="statement"><span class="rid">G3.</span>Keep traps, rules and decisions. Delete descriptions of what the code visibly does.</p>
-        <p>A trap is behaviour an agent cannot see in the code, which costs an hour when missed. A rule says what to do or avoid. A decision records a choice and why. A description only retells the code. The test: if an agent learns it by opening one file or running one search, it does not belong in the doc.</p>
+        <p>A trap is behaviour an agent cannot see in the code. Missing it costs an hour. A rule says what to do or avoid. A decision records a choice and why. A description only retells the code. If an agent learns a fact by opening one file or running one search, the fact does not belong in the doc.</p>
         <p>Descriptions are the sentences that go false. The code changes and nobody updates the retelling.</p>
         <div class="pair">
-          <div><span>Keep (trap):</span>A new service file has to be imported by hand. A file nobody imports is never mounted, and its route answers 404.</div>
+          <div><span>Keep (trap):</span>A new service file has to be imported by hand. The server never mounts a file nobody imports, and its route answers 404.</div>
           <div><span>Delete (description):</span>A service file exports one definition or an array of them.</div>
         </div>
       </div>
@@ -205,7 +205,7 @@ td:first-child { white-space: nowrap; }
     <div class="rule" id="G4">
       <div>
         <p class="statement"><span class="rid">G4.</span>No line numbers. Name the file and the identifier.</p>
-        <p>A line number is correct until the next commit above it. A function name survives most edits, and when it does not, a search finds the break.</p>
+        <p>A line number is correct until the next commit changes a line above it. A function name survives most edits, and when it does not, a search finds the break.</p>
       </div>
     </div>
 
@@ -213,7 +213,7 @@ td:first-child { white-space: nowrap; }
       <div>
         <p class="statement"><span class="rid">G5.</span>No pasted copies of real files. A code block shows a shape.</p>
         <p>A block labelled with a real file path is a copy, and a copy goes stale without any warning. Write the smallest shape that shows the pattern, and point at the file to copy.</p>
-        <div class="evidence"><b>Example:</b>A 30-line copy of a vendor file was already wrong: it called a function it no longer imported.</div>
+        <div class="evidence"><b>Example:</b>A 30-line copy of a vendor file was already wrong. It called a function the vendor file no longer imported.</div>
       </div>
     </div>
 
@@ -245,7 +245,7 @@ td:first-child { white-space: nowrap; }
     <div class="rule" id="G9">
       <div>
         <p class="statement"><span class="rid">G9.</span>Prove every claim about behaviour by reading the code.</p>
-        <p>A claim that sounds logical from the shape of the code is a guess. A reviewer who reads it makes the same guess and agrees, so reviews do not catch it.</p>
+        <p>A claim that sounds logical from the shape of the code is a guess. A reviewer who reads it makes the same guess and agrees. Reviews do not catch it.</p>
         <div class="evidence"><b>Example:</b>"A wrong parameter name makes the call 404" sounded right, because the URL is built from the call. The code sends only the values, so a wrong name puts the value in the wrong parameter and no error appears.</div>
       </div>
     </div>
@@ -275,8 +275,8 @@ td:first-child { white-space: nowrap; }
 
     <div class="rule" id="G13">
       <div>
-        <p class="statement"><span class="rid">G13.</span>Put a trap in the doc that loads on the file where the mistake gets made.</p>
-        <p>A doc is path scoped: it loads only when the agent opens a matching file (in Claude Code, the <code>paths:</code> list in its frontmatter). A trap in a doc that never loads on the right file never helps anyone. Check which docs load for a file before you decide where a line goes.</p>
+        <p class="statement"><span class="rid">G13.</span>Put a trap in the doc that loads on the file where an agent makes the mistake.</p>
+        <p>A doc is path scoped. It loads only when the agent opens a matching file. In Claude Code, the <code>paths:</code> list in the doc's frontmatter sets which files match. Check which docs load for a file before you decide where a line goes.</p>
         <div class="evidence"><b>Example:</b>The trap "never run prettier over these files" lived in a doc that loads only on translation files. Nobody editing a component ever saw it.</div>
       </div>
     </div>
@@ -284,8 +284,8 @@ td:first-child { white-space: nowrap; }
     <div class="rule" id="G14">
       <div>
         <p class="statement"><span class="rid">G14.</span>Never narrow a doc's loading to save context.</p>
-        <p>A rule that fails to load where it matters costs far more than a few kilobytes of context. Narrow a path scope only when you are sure the doc has nothing to say to those files. After any change, check that the doc still loads on the file where the trap's mistake gets made. Check it with a script, not by hand: a hand check covers only what someone remembers to check, and a script checks every doc every time.</p>
-        <div class="evidence"><b>Example:</b>A short script in the repo reads the <code>paths:</code> list of every rule doc, flags a pattern that matches no tracked file, and, given one file, lists the docs that load for it. In Node it needs one dependency, <code>multimatch</code>, which also handles brace patterns.</div>
+        <p>A rule that fails to load where it matters costs far more than a few kilobytes of context. Narrow a path scope only when you are sure the doc has nothing to say to those files. After any change, check that the doc still loads on the file where an agent makes the mistake. Check it with a script, not by hand. A hand check covers only what someone remembers to check, and a script checks every doc every time.</p>
+        <div class="evidence"><b>Example:</b>A short script in the repo reads the <code>paths:</code> list of every rule doc and flags a pattern that matches no tracked file. Given one file, the script lists the docs that load for it. In Node it needs one dependency, <code>multimatch</code>, which also handles brace patterns.</div>
       </div>
     </div>
 
@@ -293,8 +293,8 @@ td:first-child { white-space: nowrap; }
 
     <div class="rule" id="G15">
       <div>
-        <p class="statement"><span class="rid">G15.</span>A false line is deleted by default.</p>
-        <p>Making a false line true almost always means adding its exception or its caveat, so every fix makes the doc longer and harder to keep true. Keep a line only when it is a trap. Then write its shortest true version.</p>
+        <p class="statement"><span class="rid">G15.</span>Delete a false line by default.</p>
+        <p>Making a false line true almost always means adding its exception or its caveat. Every such fix makes the doc longer and harder to keep true. Keep a line only when it is a trap. Then write its shortest true version.</p>
       </div>
     </div>
 
@@ -315,14 +315,14 @@ td:first-child { white-space: nowrap; }
     <div class="rule" id="G18">
       <div>
         <p class="statement"><span class="rid">G18.</span>Review rules by running commands, with a fresh agent. Then check the reviewer.</p>
-        <p>A review that only reads the doc opens the example the doc names, and that example agrees, because the line was written from it. The reviewer has to search and count. Use a fresh agent and not a copy of the one that wrote the lines, because a copy carries the same context and defends it. Before you apply a finding, check its evidence yourself: reviewers are wrong sometimes too.</p>
+        <p>A reviewer that only reads the doc opens the example the doc names. That example agrees, because the writer built the line from it. The reviewer has to search and count. Use a fresh agent and not a copy of the one that wrote the lines. A copy starts from the same context and agrees with the lines it wrote. Before you apply a finding, check its evidence yourself. Reviewers are wrong sometimes too.</p>
       </div>
     </div>
 
     <div class="rule" id="G19">
       <div>
-        <p class="statement"><span class="rid">G19.</span>Review the changed lines in every rules MR, and audit everything only now and then. Stop when the findings turn into taste.</p>
-        <p>A reviewer's job is to find something, so a fresh one always will. What matters is the kind of finding. Another round is worth it only while reviews still find false claims or rules that do not load where they matter. The code proves those. When the findings become wording, or a new reviewer disagrees with the last one, stop.</p>
+        <p class="statement"><span class="rid">G19.</span>Review the changed lines in every rules MR, and audit everything only now and then. Stop when the findings become matters of taste.</p>
+        <p>A reviewer's job is to find something. A fresh reviewer always will. What matters is the kind of finding. Another round is worth it only while reviews still find false claims or rules that do not load where they matter. The code proves those. When the findings become wording, or a new reviewer disagrees with the last one, stop.</p>
       </div>
     </div>
 
@@ -334,11 +334,11 @@ td:first-child { white-space: nowrap; }
     </div>
 
     <h2 id="loop-section">Review loop</h2>
-    <p class="section-note">A fixed set of steps that checks rule docs against the code and fixes what the owner approves. A critic agent looks for false lines, a refuter agent tries to disprove each finding, and nothing changes until you say go. It works after any rules task: a first draft, new rules added to existing docs, or a review of someone's MR.</p>
+    <p class="section-note">The review loop is a fixed set of steps. It checks rule docs against the code and fixes what the owner approves. A critic agent looks for false lines, a refuter agent tries to disprove each finding, and nothing changes until you say go. It works after any rules task: a first draft, new rules added to existing docs, or a review of someone's MR.</p>
     <p>Your prompt has two parts:</p>
     <ol class="steps">
       <li><div><strong>Your task, in your own words.</strong> What you want done and which rule docs it touches.</div></li>
-      <li><div><strong>The loop, pasted under the task.</strong> It runs when the task is done, or right away if the task is only a review, on every rule doc line the task added, changed or names. Keep the steps as they are.</div></li>
+      <li><div><strong>The loop, pasted under the task.</strong> It covers every rule doc line the task added, changed or names. It starts when the task is done, or right away if the task is only a review. Keep the steps as they are.</div></li>
     </ol>
     <p><em>Example task: "Add a rule for <code>src/payments/</code> to <code>docs/ai/payments.md</code>: a new payment status also needs its translation key." Then paste the loop under it.</em></p>
 
@@ -352,20 +352,24 @@ Do the task above first. If the task is only a review, start here.
 You need four things: which docs and lines to review, how a doc loads (for example a `paths:` list, and the command that lists which docs load for one file), which code is the correct pattern, and how to run commands in this repo. If the task does not say one of them, ask me and wait. Never guess which docs to review.
 
 Step 1. Critic.
-Start one new subagent, never a copy or fork of this session, because a copy carries the context that wrote the lines and defends them. Give it only this brief and the four things from step 0. It reads and reports, and never edits.
+Start one new subagent, never a copy or fork of this session, because a copy starts from the context that wrote the lines and agrees with them. Give it only this brief and the four things from step 0. It reads and reports, and never edits.
 
   A finding is one of three things:
   - a false line that makes an agent write wrong code
   - a missing line, where an agent following today's docs writes broken code and nothing warns them
-  - a rule that does not load on the file where the mistake gets made
+  - a rule that does not load on the file where an agent makes the mistake
   Prove every finding by running commands (search, count, read the code, the loading command). Never infer from how the code looks.
   Code that breaks a rule does not make the rule false. Do not report it.
-  Every finding names: the doc and the line, quoted briefly; the command and its output; the file an agent edits where it gets hurt, and what it would write wrong there; the action, which is "delete", "add one sentence" with the sentence and the doc it goes into, or a one-sentence rewrite.
+  Every finding names:
+    - the doc and the line, quoted briefly
+    - the command and its output
+    - the file where an agent makes the mistake, and what it would write wrong there
+    - the action, which is "delete", "add one sentence" with the sentence and the doc it goes into, or a one-sentence rewrite
   Out of scope: wording, style, repeated text, and bugs in the code itself.
   "No findings" is a correct result. Do not fill the report to look thorough.
 
 Step 2. Refuter.
-For each finding, start another new subagent, all of them in parallel. Give each one the quoted line, the command and its output, and the file where an agent gets hurt. Leave out the critic's explanation, so the refuter checks the code and not the critic's argument. Its job is to disprove the finding:
+For each finding, start another new subagent, all of them in parallel. Give each one the quoted line, the command and its output, and the file where an agent makes the mistake. Leave out the critic's explanation, so the refuter checks the code and not the critic's argument. Its job is to disprove the finding:
   - Attack both halves: that the line is false, and that an agent editing the named file would write wrong code.
   - Use at least two different sources of evidence, for example the code path, the config, the git history, or the code that calls it.
   - Every statement needs a file and an identifier it read itself, in this session.
@@ -373,7 +377,7 @@ For each finding, start another new subagent, all of them in parallel. Give each
 Drop every REFUTED finding. An UNDECIDABLE finding comes to me as a question.
 
 Step 3. Report, then wait.
-Show me the findings that stand, in three groups: wrong lines, missing lines, rules that do not load. Every item names the file where the damage happens and carries your recommendation, so "go" is a complete answer. If a finding undoes an earlier decision, for example by putting back a line an earlier fix removed, say so. Then wait. Edit nothing until I answer.
+Show me the findings that stand, in three groups: wrong lines, missing lines, rules that do not load. Every item names the file where an agent makes the mistake and carries your recommendation, so "go" is a complete answer. If a finding undoes an earlier decision, for example by putting back a line an earlier fix removed, say so. Then wait. Edit nothing until I answer.
 
 Step 4. Fix.
 Apply only what I approved, in this session, not in a subagent.
@@ -381,10 +385,10 @@ Apply only what I approved, in this session, not in a subagent.
   - No line numbers, no counts, no lists of which files do something, no pasted copies of real files.
   - When you overturn a claim, search every doc for the old claim and fix it everywhere in the same pass.
   - Never narrow a doc's loading to save context.
-Then check every changed doc: its word count against the main branch, that every path in the changed lines exists, and that the doc still loads on the file where the mistake gets made.
+Then check every changed doc: its word count against the main branch, that every path in the changed lines exists, and that the doc still loads on the file where an agent makes the mistake.
 
 Step 5. Another round, or stop.
-Run steps 1 to 4 again, on the lines you just changed only. Another round is worth it only while the critic still finds lines that make an agent write wrong code, or rules that do not load where they matter. Stop when the findings turn into wording, or when a new critic disagrees with the last one, and tell me which one stopped you.
+Run steps 1 to 4 again, on the lines you just changed only. Another round is worth it only while the critic still finds lines that make an agent write wrong code, or rules that do not load where they matter. Stop when the findings turn into wording, or when a new critic disagrees with the last one, and tell me which of the two stopped you.
 
 Do not commit.</pre>
     </div>
@@ -393,16 +397,16 @@ Do not commit.</pre>
     <ul class="plain">
       <li>After a first draft, before the MR (G18).</li>
       <li>On every MR that touches a rule doc, on its changed lines only (G19).</li>
-      <li>On a chapter's whole doc set, only now and then. Stop when the findings turn into wording.</li>
+      <li>On a chapter's whole doc set, only now and then.</li>
     </ul>
 
     <h2 id="large">Large codebases</h2>
-    <p>A prompt that says "scan the repo and write our rules" writes one feature's habit up as a universal rule. Work area by area instead.</p>
+    <p>A prompt that says "scan the repo and write our rules" turns one feature's habit into a rule for every feature. Work area by area instead.</p>
     <ol class="steps">
-      <li><div><strong>Start with the shared layers.</strong> Draft the rules for the code every feature uses first, such as infrastructure, the HTTP client and error handling. Feature docs can then point to those rules instead of repeating them.</div></li>
+      <li><div><strong>Start with the shared layers.</strong> Draft the rules for the code every feature uses, such as infrastructure, the HTTP client and error handling. Feature docs can then point to those rules instead of repeating them.</div></li>
       <li><div><strong>One area per session.</strong> Pick one area, run your prompt, answer its questions, and ship that doc in its own MR. The next area starts in a fresh session.</div></li>
       <li><div><strong>Split a big area across subagents.</strong> Each subagent reads one sub-area and returns candidates with evidence. The main session merges them, removes repeats, and asks the owner. Subagents never write the doc, so the decisions stay in one place.</div></li>
-      <li><div><strong>Keep the owner in the loop.</strong> Where the code disagrees with itself, your task should tell the agent to ask the owner which side is the correct pattern, instead of picking the majority. Skipping that question is how a majority vote in the code becomes the rule.</div></li>
+      <li><div><strong>Ask the owner.</strong> Where two parts of the code do the same thing in different ways, your task should tell the agent to ask the owner which way is the correct pattern, instead of picking the majority.</div></li>
     </ol>
 
   </main>
