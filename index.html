@@ -1,12 +1,7 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>AI Rules Playbook</title>
 <style>
 :root {
-  color-scheme: light;
   --bg: #ffffff;
   --ink: #1f2328;
   --muted: #59636e;
@@ -38,7 +33,6 @@
 }
 * { box-sizing: border-box; }
 body {
-  margin: 0;
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font);
@@ -127,7 +121,7 @@ ul.plain li, ol.steps li { margin-bottom: 8px; }
 }
 .prompt-bar button:hover { background: var(--code-bg); }
 .prompt-bar button:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
-pre#prompt {
+pre#prompt, pre#loop {
   margin: 0;
   padding: 14px;
   background: var(--code-bg);
@@ -151,8 +145,6 @@ td:first-child { white-space: nowrap; }
   nav.toc { position: static; }
 }
 </style>
-</head>
-<body>
 
 <div class="page">
   <nav class="toc" aria-label="Contents">
@@ -164,10 +156,9 @@ td:first-child { white-space: nowrap; }
       <li class="sub"><a href="#true">Lines that stay true</a></li>
       <li class="sub"><a href="#where">Where a line lives</a></li>
       <li class="sub"><a href="#review">Fixing and reviewing</a></li>
-      <li><a href="#prompt-section">Drafting prompt</a></li>
-      <li class="sub"><a href="#adapt">Filling it in</a></li>
-      <li class="sub"><a href="#large">Large codebases</a></li>
-      <li class="sub"><a href="#after">After the draft</a></li>
+      <li><a href="#loop-section">Review loop</a></li>
+      <li class="sub"><a href="#when">When to run it</a></li>
+      <li><a href="#large">Large codebases</a></li>
     </ol>
   </nav>
 
@@ -231,8 +222,8 @@ td:first-child { white-space: nowrap; }
         <p class="statement"><span class="rid">G6.</span>No counts and no lists of who does what. Write the condition that decides.</p>
         <p>A list of pages, routes or helpers is true today and wrong the day someone adds one more. The condition behind the list stays true.</p>
         <div class="pair">
-          <div><span>Instead of:</span>Search, browse and listing detail forward banners to the main store.</div>
-          <div><span>Write:</span>A page that shows banners forwards <code>banners</code> to the main store.</div>
+          <div><span>Instead of:</span>The search, cart and checkout pages report errors to the shared logger.</div>
+          <div><span>Write:</span>A page that can fail reports its errors to the shared logger.</div>
         </div>
       </div>
     </div>
@@ -294,7 +285,7 @@ td:first-child { white-space: nowrap; }
       <div>
         <p class="statement"><span class="rid">G14.</span>Never narrow a doc's loading to save context.</p>
         <p>A rule that fails to load where it matters costs far more than a few kilobytes of context. Narrow a path scope only when you are sure the doc has nothing to say to those files. After any change, check that the doc still loads on the file where the trap's mistake gets made. Check it with a script, not by hand: a hand check covers only what someone remembers to check, and a script checks every doc every time.</p>
-        <div class="evidence"><b>Example:</b>A short Node script reads the <code>paths:</code> list of every rule doc, flags a pattern that matches no tracked file, and, given one file, lists the docs that load for it. It needs one dependency, <code>multimatch</code>, which also handles brace patterns.</div>
+        <div class="evidence"><b>Example:</b>A short script in the repo reads the <code>paths:</code> list of every rule doc, flags a pattern that matches no tracked file, and, given one file, lists the docs that load for it. In Node it needs one dependency, <code>multimatch</code>, which also handles brace patterns.</div>
       </div>
     </div>
 
@@ -342,114 +333,108 @@ td:first-child { white-space: nowrap; }
       </div>
     </div>
 
-    <h2 id="prompt-section">Drafting prompt</h2>
-    <p class="section-note">A starting prompt for the first version of a chapter's rules. It works on one area at a time and stops to ask the owner before it writes anything. Fill in the coloured parts, then adapt the rest to your stack.</p>
+    <h2 id="loop-section">Review loop</h2>
+    <p class="section-note">A fixed set of steps that checks rule docs against the code and fixes what the owner approves. A critic agent looks for false lines, a refuter agent tries to disprove each finding, and nothing changes until you say go. It works after any rules task: a first draft, new rules added to existing docs, or a review of someone's MR.</p>
+    <p>Your prompt has two parts:</p>
+    <ol class="steps">
+      <li><div><strong>Your task, in your own words.</strong> What you want done and which rule docs it touches.</div></li>
+      <li><div><strong>The loop, pasted under the task.</strong> It runs when the task is done, or right away if the task is only a review, on every rule doc line the task added, changed or names. Keep the steps as they are.</div></li>
+    </ol>
+    <p><em>Example task: "Add a rule for <code>src/payments/</code> to <code>docs/ai/payments.md</code>: a new payment status also needs its translation key." Then paste the loop under it.</em></p>
 
     <div class="prompt-box">
       <div class="prompt-bar">
-        <span>draft-ai-rules.txt</span>
-        <button type="button" id="copy">Copy</button>
+        <span>review-loop.txt</span>
+        <button type="button" data-copy="loop">Copy</button>
       </div>
-<pre id="prompt">You are drafting the first version of the AI rule docs for one area of our codebase. The main reader is an AI coding agent that loads these docs while it works in this area. Developers read them too.
+<pre id="loop">Step 0. Check what you know.
+Do the task above first. If the task is only a review, start here.
+You need four things: which docs and lines to review, how a doc loads (for example a `paths:` list, and the command that lists which docs load for one file), which code is the correct pattern, and how to run commands in this repo. If the task does not say one of them, ask me and wait. Never guess which docs to review.
 
-Area: <span class="ph">&lt;one folder or feature, for example src/payments/&gt;</span>
-Where the doc goes and how it loads: <span class="ph">&lt;for example docs/ai/payments.md, loaded through a `paths:` list in its frontmatter&gt;</span>
-Reference implementations, the correct pattern chosen by the chapter: <span class="ph">&lt;two or three paths&gt;</span>
-Known wrong consumers, never an example and never an exception: <span class="ph">&lt;paths, or "none known"&gt;</span>
-Existing docs this area must not repeat: <span class="ph">&lt;paths&gt;</span>
-How to run commands in this repo: <span class="ph">&lt;for example a Docker wrapper script, the lint command, the test command&gt;</span>
+Step 1. Critic.
+Start one new subagent, never a copy or fork of this session, because a copy carries the context that wrote the lines and defends them. Give it only this brief and the four things from step 0. It reads and reports, and never edits.
 
-Work in four steps. Stop after step 3 and wait for my answers.
+  A finding is one of three things:
+  - a false line that makes an agent write wrong code
+  - a missing line, where an agent following today's docs writes broken code and nothing warns them
+  - a rule that does not load on the file where the mistake gets made
+  Prove every finding by running commands (search, count, read the code, the loading command). Never infer from how the code looks.
+  Code that breaks a rule does not make the rule false. Do not report it.
+  Every finding names: the doc and the line, quoted briefly; the command and its output; the file an agent edits where it gets hurt, and what it would write wrong there; the action, which is "delete", "add one sentence" with the sentence and the doc it goes into, or a one-sentence rewrite.
+  Out of scope: wording, style, repeated text, and bugs in the code itself.
+  "No findings" is a correct result. Do not fill the report to look thorough.
 
-Step 1. Read. Do not write anything yet.
-Read the reference implementations first, then the rest of the area. If the area is large, split it into sub-areas and read each one with its own subagent. Each subagent returns candidates with evidence, not prose, and never writes the doc. Do not scan the whole repository.
+Step 2. Refuter.
+For each finding, start another new subagent, all of them in parallel. Give each one the quoted line, the command and its output, and the file where an agent gets hurt. Leave out the critic's explanation, so the refuter checks the code and not the critic's argument. Its job is to disprove the finding:
+  - Attack both halves: that the line is false, and that an agent editing the named file would write wrong code.
+  - Use at least two different sources of evidence, for example the code path, the config, the git history, or the code that calls it.
+  - Every statement needs a file and an identifier it read itself, in this session.
+  - Return REFUTED, STANDS or UNDECIDABLE, with the evidence.
+Drop every REFUTED finding. An UNDECIDABLE finding comes to me as a question.
 
-Step 2. List candidates.
-For everything an agent working here would need to know, write one candidate:
-- the line itself, in one or two sentences
-- its kind: trap (behaviour an agent cannot see in the code, which costs time when missed), rule (what to do or avoid), decision (a choice and its reason), or description (what the code visibly does)
-- the evidence: the file and the identifier, and for a claim about behaviour, the code you read that proves it
-- for a convention: how many places follow it and how many do not, with one path from each side
-Drop every description. Drop anything an agent learns by opening one file.
+Step 3. Report, then wait.
+Show me the findings that stand, in three groups: wrong lines, missing lines, rules that do not load. Every item names the file where the damage happens and carries your recommendation, so "go" is a complete answer. If a finding undoes an earlier decision, for example by putting back a line an earlier fix removed, say so. Then wait. Edit nothing until I answer.
 
-Step 3. Ask me.
-Where the code disagrees with itself, do not pick the majority. Show both sides with their counts and one path each, and ask me which one is the correct pattern. Put all questions in one list, and give every question your recommendation and why, so "go with your recommendations" is a complete answer. Then wait.
+Step 4. Fix.
+Apply only what I approved, in this session, not in a subagent.
+  - Delete a false line by default. Rewrite it only when the true version prevents a mistake the deletion would not, and then in its shortest form.
+  - No line numbers, no counts, no lists of which files do something, no pasted copies of real files.
+  - When you overturn a claim, search every doc for the old claim and fix it everywhere in the same pass.
+  - Never narrow a doc's loading to save context.
+Then check every changed doc: its word count against the main branch, that every path in the changed lines exists, and that the doc still loads on the file where the mistake gets made.
 
-Step 4. Write the draft.
-Write only traps, rules and decisions, with my answers applied:
-- No line numbers. Name the file and the identifier.
-- No pasted copies of real files. A code block shows a shape only.
-- No counts and no lists of which files do something. Write the condition that decides.
-- At most one example file per rule, taken from a reference implementation.
-- Use "every", "always", "only" or "never" only after you checked for the counterexample.
-- Current state only. No history, no plans.
-- Plain English, short sentences, no em dashes.
-- Each fact once. If an existing doc that loads on the same files already says it, point there.
-- Scope the doc's loading to the files where each trap's mistake gets made. When unsure, load wider, not narrower.
-Then check that every path in the draft exists, and list the files the doc will load on.
+Step 5. Another round, or stop.
+Run steps 1 to 4 again, on the lines you just changed only. Another round is worth it only while the critic still finds lines that make an agent write wrong code, or rules that do not load where they matter. Stop when the findings turn into wording, or when a new critic disagrees with the last one, and tell me which one stopped you.
 
-Report: the draft, the calls you made as defaults so I can overturn them, and every claim you could not prove.</pre>
+Do not commit.</pre>
     </div>
 
-    <h3 id="adapt">Filling it in</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Field</th><th>What to put there</th></tr></thead>
-        <tbody>
-          <tr><td>Area</td><td>What one developer works on at a time: a feature, a module, a layer. Small enough that its reference implementations can be read in one sitting.</td></tr>
-          <tr><td>Reference implementations</td><td>The chapter's own choice of the code that does it right. This is the most important field. Without it, the agent treats whatever it reads first as the pattern.</td></tr>
-          <tr><td>Known wrong consumers</td><td>Code that does it wrong and should not spread. Naming it up front keeps it out of the examples and the exceptions (G2).</td></tr>
-          <tr><td>Existing docs</td><td>Docs that already load on these files, including shared or company-wide ones. The agent points to them instead of repeating them (G12).</td></tr>
-          <tr><td>Commands</td><td>How your repo runs tools, so the agent proves behaviour instead of guessing it (G9).</td></tr>
-        </tbody>
-      </table>
-    </div>
+    <h3 id="when">When to run it</h3>
+    <ul class="plain">
+      <li>After a first draft, before the MR (G18).</li>
+      <li>On every MR that touches a rule doc, on its changed lines only (G19).</li>
+      <li>On a chapter's whole doc set, only now and then. Stop when the findings turn into wording.</li>
+    </ul>
 
-    <h3 id="large">Large codebases</h3>
+    <h2 id="large">Large codebases</h2>
     <p>A prompt that says "scan the repo and write our rules" writes one feature's habit up as a universal rule. Work area by area instead.</p>
     <ol class="steps">
       <li><div><strong>Start with the shared layers.</strong> Draft the rules for the code every feature uses first, such as infrastructure, the HTTP client and error handling. Feature docs can then point to those rules instead of repeating them.</div></li>
-      <li><div><strong>One area per session.</strong> Pick one area, run the prompt, answer its questions, and ship that doc in its own MR. The next area starts in a fresh session.</div></li>
+      <li><div><strong>One area per session.</strong> Pick one area, run your prompt, answer its questions, and ship that doc in its own MR. The next area starts in a fresh session.</div></li>
       <li><div><strong>Split a big area across subagents.</strong> Each subagent reads one sub-area and returns candidates with evidence. The main session merges them, removes repeats, and asks the owner. Subagents never write the doc, so the decisions stay in one place.</div></li>
-      <li><div><strong>Keep the owner in the loop.</strong> Step 3 of the prompt is where the owner's knowledge enters. Skipping it is how a majority vote in the code becomes the rule.</div></li>
+      <li><div><strong>Keep the owner in the loop.</strong> Where the code disagrees with itself, your task should tell the agent to ask the owner which side is the correct pattern, instead of picking the majority. Skipping that question is how a majority vote in the code becomes the rule.</div></li>
     </ol>
-
-    <h3 id="after">After the draft</h3>
-    <ul class="plain">
-      <li>Have a fresh agent review the draft against the code before the MR (G18). Give the reviewer the paths to check, the known wrong consumers, and the instruction to prove every claim with a command.</li>
-      <li>From then on, every MR that touches a rule doc gets one fresh review of its changed lines (G19).</li>
-      <li>Audit a chapter's whole doc set only now and then, and stop when the findings turn into wording.</li>
-    </ul>
 
   </main>
 </div>
 
 <script>
 (function () {
-  var button = document.getElementById('copy');
-  var pre = document.getElementById('prompt');
-  if (!button || !pre) { return; }
-  button.addEventListener('click', function () {
-    var text = pre.innerText;
-    function selectText() {
-      var range = document.createRange();
-      range.selectNodeContents(pre);
-      var selection = window.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
-      button.textContent = 'Selected, press Ctrl+C';
-    }
-    try {
-      navigator.clipboard.writeText(text).then(function () {
-        button.textContent = 'Copied';
-        setTimeout(function () { button.textContent = 'Copy'; }, 2000);
-      }, selectText);
-    } catch (error) {
-      selectText();
-    }
+  var buttons = document.querySelectorAll('button[data-copy]');
+  Array.prototype.forEach.call(buttons, function (button) {
+    var pre = document.getElementById(button.getAttribute('data-copy'));
+    if (!pre) { return; }
+    button.addEventListener('click', function () {
+      var text = pre.innerText;
+      function selectText() {
+        var range = document.createRange();
+        range.selectNodeContents(pre);
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        button.textContent = 'Selected, press Ctrl+C';
+      }
+      try {
+        navigator.clipboard.writeText(text).then(function () {
+          button.textContent = 'Copied';
+          setTimeout(function () { button.textContent = 'Copy'; }, 2000);
+        }, selectText);
+      } catch (error) {
+        selectText();
+      }
+    });
   });
 })();
 </script>
 
-</body>
-</html>
+</body></html>
