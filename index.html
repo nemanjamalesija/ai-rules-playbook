@@ -176,23 +176,23 @@ td:first-child { white-space: nowrap; }
     <div class="rule" id="G1">
       <div>
         <p class="statement"><span class="rid">G1.</span>A doc states the correct pattern, and the chapter decides what that pattern is.</p>
-        <p>An agent that writes a doc only sees the files it has open. It sees one feature do something and writes "every page does X", because that is how documentation usually sounds. Counting across the code catches a doc that copied one feature. The count still does not decide the pattern. A person who owns the area does.</p>
+        <p>An agent that writes a doc only sees the files it has open. It sees one feature do something and writes "every page does X", because that is how documentation usually sounds. Search the code and count how many features really do X. The count catches a doc that copied one feature. The count still does not tell you which pattern is correct, because most of the code can do it the wrong way. A person who owns that area of the code decides.</p>
         <div class="evidence"><b>Example:</b>A doc told everyone to put a feature's pages in a <code>pages/</code> folder. Only one feature did that. Five others kept their pages flat, and the one feature was the wrong one.</div>
       </div>
     </div>
 
     <div class="rule" id="G2">
       <div>
-        <p class="statement"><span class="rid">G2.</span>A consumer that breaks the pattern never becomes an exception line or an example.</p>
-        <p>Code that breaks a rule does not make the rule false. If the doc adds "except in feature Y", the agent reads feature Y as allowed and copies it. Keep a short list of the known wrong consumers in your area, and give it to every agent that writes or reviews your rules.</p>
+        <p class="statement"><span class="rid">G2.</span>Code that breaks the pattern never goes into the doc, not as an exception and not as an example.</p>
+        <p>Code that breaks a rule does not make the rule false. If the doc adds "except in feature Y", the agent reads feature Y as allowed and copies it. Keep a short list of the places in your area that break the pattern, and give it to every agent that writes or reviews your rules.</p>
       </div>
     </div>
 
     <div class="rule" id="G3">
       <div>
         <p class="statement"><span class="rid">G3.</span>Keep traps, rules and decisions. Delete descriptions of what the code visibly does.</p>
-        <p>A trap is behaviour an agent cannot see in the code. Missing it costs an hour. A rule says what to do or avoid. A decision records a choice and why. A description only retells the code. If an agent learns a fact by opening one file or running one search, the fact does not belong in the doc.</p>
-        <p>Descriptions are the sentences that go false. The code changes and nobody updates the retelling.</p>
+        <p>A trap is behaviour an agent cannot see in the code. Missing it costs an hour. A rule says what to do or avoid. A decision records a choice and why. A description says what the code does, and an agent can read that in the code itself. If an agent learns a fact by opening one file or running one search, the fact does not belong in the doc.</p>
+        <p>A line that only describes the code is the line most likely to become wrong. Someone changes the code, nobody edits the doc, and the doc keeps describing code that no longer exists.</p>
         <div class="pair">
           <div><span>Keep (trap):</span>A new service file has to be imported by hand. The server never mounts a file nobody imports, and its route answers 404.</div>
           <div><span>Delete (description):</span>A service file exports one definition or an array of them.</div>
@@ -205,22 +205,22 @@ td:first-child { white-space: nowrap; }
     <div class="rule" id="G4">
       <div>
         <p class="statement"><span class="rid">G4.</span>No line numbers. Name the file and the identifier.</p>
-        <p>A line number is correct until the next commit changes a line above it. A function name survives most edits, and when it does not, a search finds the break.</p>
+        <p>A line number is correct until the next commit changes a line above it. A function name survives most edits, and when it does not, a search for the name shows that it is gone.</p>
       </div>
     </div>
 
     <div class="rule" id="G5">
       <div>
-        <p class="statement"><span class="rid">G5.</span>No pasted copies of real files. A code block shows a shape.</p>
-        <p>A block labelled with a real file path is a copy, and a copy goes stale without any warning. Write the smallest shape that shows the pattern, and point at the file to copy.</p>
+        <p class="statement"><span class="rid">G5.</span>No pasted copies of real files. A code block shows a short made-up example.</p>
+        <p>A code block labelled with a real file path claims to be that file. The file changes, the block does not, and nothing warns anyone. Write the smallest made-up example that shows the pattern, and name the real file to copy from.</p>
         <div class="evidence"><b>Example:</b>A 30-line copy of a vendor file was already wrong. It called a function the vendor file no longer imported.</div>
       </div>
     </div>
 
     <div class="rule" id="G6">
       <div>
-        <p class="statement"><span class="rid">G6.</span>No counts and no lists of who does what. Write the condition that decides.</p>
-        <p>A list of pages, routes or helpers is true today and wrong the day someone adds one more. The condition behind the list stays true.</p>
+        <p class="statement"><span class="rid">G6.</span>No counts and no lists of who does what. Write the condition that decides who does it.</p>
+        <p>A list of pages, routes or helpers is true today and wrong the day someone adds one more. The condition that puts a page on the list stays true.</p>
         <div class="pair">
           <div><span>Instead of:</span>The search, cart and checkout pages report errors to the shared logger.</div>
           <div><span>Write:</span>A page that can fail reports its errors to the shared logger.</div>
@@ -230,8 +230,8 @@ td:first-child { white-space: nowrap; }
 
     <div class="rule" id="G7">
       <div>
-        <p class="statement"><span class="rid">G7.</span>At most one example file per rule, and it comes from a correct consumer.</p>
-        <p>One file to copy helps. Three files turn into a list (G6). An example from a wrong consumer teaches the wrong pattern (G2).</p>
+        <p class="statement"><span class="rid">G7.</span>At most one example file per rule, and it comes from code that follows the pattern.</p>
+        <p>One file to copy helps. Three files turn into a list (G6). An example from code that breaks the pattern teaches the wrong pattern (G2).</p>
       </div>
     </div>
 
@@ -245,7 +245,7 @@ td:first-child { white-space: nowrap; }
     <div class="rule" id="G9">
       <div>
         <p class="statement"><span class="rid">G9.</span>Prove every claim about behaviour by reading the code.</p>
-        <p>A claim that sounds logical from the shape of the code is a guess. A reviewer who reads it makes the same guess and agrees. Reviews do not catch it.</p>
+        <p>A claim you worked out from how the code looks, without following what it does, is a guess. A reviewer who reads the claim makes the same guess and agrees. That is why a review does not catch it.</p>
         <div class="evidence"><b>Example:</b>"A wrong parameter name makes the call 404" sounded right, because the URL is built from the call. The code sends only the values, so a wrong name puts the value in the wrong parameter and no error appears.</div>
       </div>
     </div>
@@ -269,7 +269,7 @@ td:first-child { white-space: nowrap; }
     <div class="rule" id="G12">
       <div>
         <p class="statement"><span class="rid">G12.</span>Each fact lives in one doc. Point to it instead of repeating it.</p>
-        <p>Two copies of a fact drift apart, and then the agent loads both and has to pick one. Before you add a line, search the other docs. If a doc that loads on the same files already says it, write a pointer.</p>
+        <p>Someone updates one copy of a fact and not the other. Then the agent loads both docs and has to pick one. Before you add a line, search the other docs. If a doc that loads on the same files already says it, write a pointer.</p>
       </div>
     </div>
 
@@ -284,7 +284,7 @@ td:first-child { white-space: nowrap; }
     <div class="rule" id="G14">
       <div>
         <p class="statement"><span class="rid">G14.</span>Never narrow a doc's loading to save context.</p>
-        <p>A rule that fails to load where it matters costs far more than a few kilobytes of context. Narrow a path scope only when you are sure the doc has nothing to say to those files. After any change, check that the doc still loads on the file where an agent makes the mistake. Check it with a script, not by hand. A hand check covers only what someone remembers to check, and a script checks every doc every time.</p>
+        <p>A rule that does not load on the file where an agent makes the mistake costs far more than a few extra kilobytes of context. Narrow a path scope only when you are sure the doc has nothing to say to those files. After any change, check that the doc still loads on the file where an agent makes the mistake. Check it with a script, not by hand. A hand check covers only what someone remembers to check, and a script checks every doc every time.</p>
         <div class="evidence"><b>Example:</b>A short script in the repo reads the <code>paths:</code> list of every rule doc and flags a pattern that matches no tracked file. Given one file, the script lists the docs that load for it. In Node it needs one dependency, <code>multimatch</code>, which also handles brace patterns.</div>
       </div>
     </div>
@@ -301,35 +301,35 @@ td:first-child { white-space: nowrap; }
     <div class="rule" id="G16">
       <div>
         <p class="statement"><span class="rid">G16.</span>When you overturn a claim, search every doc for the old claim in the same change.</p>
-        <p>The old answer stays in every other file that repeated it, and those files still look approved. Nothing shows the gap until an agent loads two docs that disagree.</p>
+        <p>The old answer stays in every other file that repeated it, and those files still look reviewed. Nobody notices until an agent loads two docs that say opposite things.</p>
       </div>
     </div>
 
     <div class="rule" id="G17">
       <div>
         <p class="statement"><span class="rid">G17.</span>Measure each changed doc against the main branch.</p>
-        <p>Compare the word count per doc. A fix makes a doc longer only when it adds a real trap. Also check that every file path in the changed lines exists.</p>
+        <p>Compare the word count per doc. A fix should make a doc longer only when it adds a real trap. Also check that every file path in the changed lines exists.</p>
       </div>
     </div>
 
     <div class="rule" id="G18">
       <div>
-        <p class="statement"><span class="rid">G18.</span>Review rules by running commands, with a fresh agent. Then check the reviewer.</p>
-        <p>A reviewer that only reads the doc opens the example the doc names. That example agrees, because the writer built the line from it. The reviewer has to search and count. Use a fresh agent and not a copy of the one that wrote the lines. A copy starts from the same context and agrees with the lines it wrote. Before you apply a finding, check its evidence yourself. Reviewers are wrong sometimes too.</p>
+        <p class="statement"><span class="rid">G18.</span>Review rules by running commands, with a fresh agent. Then check what the reviewer found.</p>
+        <p>A reviewer that only reads the doc opens the example the doc names. That example matches the line, because the writer copied the line from that example. The reviewer has to search and count. Use a fresh agent and not a copy of the one that wrote the lines. A copy starts from the same context and agrees with the lines it wrote. Before you apply a finding, check its evidence yourself. Reviewers are wrong sometimes too.</p>
       </div>
     </div>
 
     <div class="rule" id="G19">
       <div>
         <p class="statement"><span class="rid">G19.</span>Review the changed lines in every rules MR, and audit everything only now and then. Stop when the findings become matters of taste.</p>
-        <p>A reviewer's job is to find something. A fresh reviewer always will. What matters is the kind of finding. Another round is worth it only while reviews still find false claims or rules that do not load where they matter. The code proves those. When the findings become wording, or a new reviewer disagrees with the last one, stop.</p>
+        <p>A reviewer's job is to find something. A fresh reviewer always will. What matters is the kind of finding. Another round is worth it only while reviews still find false claims or rules that do not load where they matter. You can prove both from the code. When the findings are only about wording, or a new reviewer disagrees with the last one, stop.</p>
       </div>
     </div>
 
     <div class="rule" id="G20">
       <div>
         <p class="statement"><span class="rid">G20.</span>Bloat means repeated or unneeded text, not a large file.</p>
-        <p>A long doc full of real traps is fine. A short doc that retells the code is not. Cut repetition and descriptions. Never cut a trap to reach a length.</p>
+        <p>A long doc full of real traps is fine. A short doc that only describes the code is not. Cut repetition and descriptions. Never cut a trap to reach a length.</p>
       </div>
     </div>
 
